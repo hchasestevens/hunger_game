@@ -1,10 +1,12 @@
-# ===SAMPLE PLAYER===
-# Might want to use following for prediction of opponents? http://www.evanmiller.org/how-not-to-sort-by-average-rating.html
-# ptyhon implementation (as by reddit) here: http://stackoverflow.com/questions/10029588/python-implementation-of-the-wilson-score-interval
-# NB comment in above saying 95% confidence should be z = 1.96, not z = 1.6
-
-##OOP version:
-#Seems like a good idea to use this approach, for ease of testing/competition simulation
+# ===UNDERMINER===
+# General strategy:
+# Assume other players are inferring identity via reputation.
+# Assume (at least some of) these other players are employing tit-for-tat.
+# If in a position with a slightly better reputation than some opponent
+# and the ability to decrease own reputation to be slightly below the 
+# projected lower bound of said opponent's next-round reputation, do so,
+# thereby assuming their identity (and making gains) while simultaneously
+# offloading some repercussions.
 
 from math import sqrt
 
@@ -23,6 +25,9 @@ class Player:
         self.food = 0
         self.reputation = 0
         self.confidence_interval = 1.0 #1.0 = 85%, 1.6 = 95%
+        self.rounds_elapsed = 0
+        self.player_histories = None
+        self.decisions_made = 0
 
     # All the other functions are the same as with the non object oriented setting (but they
     # should be instance methods so don't forget to add 'self' as an extra first argument).
@@ -64,6 +69,8 @@ class Player:
                            + sum of all entries of food_earnings + award from round_end.
                            The list will be in the same order as the decisions you made in that round.
         '''
+
+        self.decisions_made += len(food_earnings)
         pass # do nothing
 
 
@@ -83,20 +90,22 @@ class Player:
                    current_food (including food_earnings from hunt_outcomes this round) + award.
             number_hunters: integer, number of times players chose to hunt in the last round.
         '''
+
+        self.rounds_elapsed += 1
         pass # do nothing
 
 
-    def _confidence(self, ups, downs):
-        n = ups + downs
-        if n == 0:
+    def _confidence(self, reputation):
+        if not self.decisions_made:
             return 0
-        z = self.confidence_interval
-        phat = float(ups) / n
-        return ((phat + z*z/(2*n) - z * sqrt((phat*(1-phat)+z*z/(4*n))/n))/(1+z*z/n))
+        return self._calc_confidence(reputation, self.decisions_made, self.confidence_interval)
 
 
-    def confidence(self, ups, downs):
-        if ups + downs == 0:
-            return 0
-        else:
-            return _confidence(ups, downs)
+    @staticmethod
+    def _calc_confidence(reputation, n, z):
+        '''
+        Get lower bound of william score interval.
+        Taken from http://stackoverflow.com/questions/10029588/python-implementation-of-the-wilson-score-interval.
+        '''
+        return ((reputation + z*z/(2*n) - z * sqrt((reputation*(1-reputation)+z*z/(4*n))/n))/(1+z*z/n))
+
