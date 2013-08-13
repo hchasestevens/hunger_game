@@ -1,12 +1,18 @@
 # ===UNDERMINER===
-# General strategy:
-# Assume other players are inferring identity via reputation.
-# Assume (at least some of) these other players are employing tit-for-tat.
-# If in a position with a slightly better reputation than some opponent
-# and the ability to decrease own reputation to be slightly below the 
-# projected lower bound of said opponent's next-round reputation, do so,
-# thereby assuming their identity (and making gains) while simultaneously
-# offloading some repercussions.
+'''
+General strategy:
+
+- Assume other players are inferring identity via reputation.
+
+- Assume (at least some of) these other players are employing tit-for-tat.
+
+- If in a position with a slightly better reputation than some opponent
+ and the ability to decrease own reputation to be slightly below the 
+ projected lower bound of said opponent's next-round reputation, do so,
+ thereby assuming their identity (and making gains) while simultaneously
+ offloading some repercussions.
+
+'''
 
 from math import sqrt
 
