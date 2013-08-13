@@ -1,5 +1,7 @@
 # ===SAMPLE PLAYER===
 # Might want to use following for prediction of opponents? http://www.evanmiller.org/how-not-to-sort-by-average-rating.html
+# ptyhon implementation (as by reddit) here: http://stackoverflow.com/questions/10029588/python-implementation-of-the-wilson-score-interval
+# NB comment in above saying 95% confidence should be z = 1.96, not z = 1.6
 
 ##OOP version:
 #Seems like a good idea to use this approach, for ease of testing/competition simulation
