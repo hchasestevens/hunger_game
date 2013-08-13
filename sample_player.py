@@ -69,6 +69,7 @@ def round_end(award, m, number_hunters):
     pass
 
 ##OOP version:
+#Seems like a good idea to use this approach, for ease of testing/competition simulation
 
 class Player:
     def __init__(self):
