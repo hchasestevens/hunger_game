@@ -32,7 +32,8 @@ class Player:
         self.reputation = 0
         self.confidence_interval = 1.0 #1.0 = 85%, 1.96 = 95%
         self.rounds_elapsed = 0
-        self.player_histories = None
+        self.player_histories = []
+        self.last_responses = None
         self.decisions_made = 0
 
     # All the other functions are the same as with the non object oriented setting (but they
@@ -60,18 +61,25 @@ class Player:
         '''
         
         self.reputation = current_reputation
+        self.player_histories.append(player_reputations)
 
         _, lower_bound = self._get_reputation_bounds(len(player_reputations))
 
         opponents_projected = map(lambda rep: self._confidence(rep, len(player_reputations)), player_reputations)
         underminable = filter(lambda (projected,current): projected > lower_bound, opponents_projected)
         if underminable:
-             aim = min(underminable)
-             slacks_allowed = self._get_slacks_needed(aim, len(player_reputations))
-             # Choose how to allocate allowed slacks
+            aim = min(underminable)
+            slacks_allowed = self._get_slacks_needed(aim, len(player_reputations))
+            # return [(int, bool)] where int = index of player_reputations and bool = cooperated last round
+            cooperators = map(lambda ((reputation, i), prev_action): (i, prev_action >= 0),
+                                      zip(sorted((rep, i) for i, rep in enumerate(player_reputations)),
+                                          self.last_responses if self.last_responses is not None else [1] * len(player_reputations)
+                                          )
+                                      )
+            cooperators.sort()
         else:
-             # tit-for-tat stuff?
-             pass
+            # tit-for-tat stuff?
+            pass
 
         hunt_decisions = ['h' for x in player_reputations] # replace logic with your own
         return hunt_decisions
@@ -92,6 +100,13 @@ class Player:
         '''
 
         self.decisions_made += len(food_earnings)
+        self.last_responses = food_earnings
+
+        # match results with reputations, order accordingly:
+        self.player_histories[-1], self.last_responses = zip(*sorted(zip(self.player_histories[-1],
+                                                                         self.last_responses)
+                                                                     )
+                                                             )
         pass # do nothing
 
 
@@ -113,6 +128,7 @@ class Player:
         '''
 
         self.rounds_elapsed += 1
+
         pass # do nothing
 
 
