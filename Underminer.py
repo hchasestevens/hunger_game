@@ -69,16 +69,21 @@ class Player:
         underminable = filter(lambda (projected,current): projected > lower_bound, opponents_projected)
         if underminable:
             aim = min(underminable)
-            slacks_allowed = self._get_slacks_needed(aim, len(player_reputations))
-            # return [(int, bool)] where int = index of player_reputations and bool = cooperated last round
+            hunts_allowed = len(player_reputations) - self._get_slacks_needed(aim, len(player_reputations))
+            # [(int, bool)] where int = index of player_reputations and bool = cooperated last round:
             cooperators = map(lambda ((reputation, i), prev_action): (i, prev_action >= 0),
                                       zip(sorted((rep, i) for i, rep in enumerate(player_reputations)),
                                           self.last_responses if self.last_responses is not None else [1] * len(player_reputations)
                                           )
                                       )
             cooperators.sort()
+            player_reputations = zip(player_reputations, (cooperated for i, cooperated in cooperators))
+            # TODO: take above [(float, bool)] where float = opponent_reputation and bool = cooperated last round and 
+            #  decide which of the opponents to cooperate with for the hunts we can perform (if any). If 
+            #  delta_reputation is a neccesary variable in this decision, best to make that happen in the above mapping
+            #  (talk to Chase if you're unsure what's going on it in). 
         else:
-            # tit-for-tat stuff?
+            # tit-for-tat stuff? - may incorporate a lot of the above, consider refactoring if so
             pass
 
         hunt_decisions = ['h' for x in player_reputations] # replace logic with your own
