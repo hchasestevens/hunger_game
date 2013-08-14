@@ -109,6 +109,7 @@ class Player:
         #  confidence interval would be 95% confidence, as expected. To do this, probably want
         #  to re-write ruby's statistics2 pnormaldist func, found here as 'pnorm':
         #  http://blade.nagaokaut.ac.jp/~sinara/ruby/math/statistics2/statistics2-0.53/statistics2.rb
+        #  Usage example: Statistics2.pnormaldist(1-(1-(.95))/2) == 1.96
         return self._calc_confidence(reputation, self.decisions_made, self.confidence_interval)
 
 
