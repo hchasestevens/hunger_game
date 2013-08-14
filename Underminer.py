@@ -65,7 +65,9 @@ class Player:
 
         _, lower_bound = self._get_reputation_bounds(len(player_reputations))
 
-        opponents_projected = map(lambda rep: self._confidence(rep, len(player_reputations)), player_reputations)
+        opponents_projected = map(lambda rep: self._confidence(rep, len(player_reputations)),
+                                  filter(lambda rep: rep < current_reputation, player_reputations)
+                                  )
         underminable = filter(lambda (projected,current): projected > lower_bound, opponents_projected)
         if underminable:
             # The following are purely informational, maybe useful for debug?:
