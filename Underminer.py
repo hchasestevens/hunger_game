@@ -58,6 +58,21 @@ class Player:
             player_reputations: list of floats, the reputations of all the remaining players in the game.
                                 The ordinal positions of players in this list will be randomized each round.
         '''
+        
+        self.reputation = current_reputation
+
+        _, lower_bound = self._get_reputation_bounds(len(player_reputations))
+
+        opponents_projected = map(lambda rep: self._confidence(rep, len(player_reputations)), player_reputations)
+        underminable = filter(lambda (projected,current): projected > lower_bound, opponents_projected)
+        if underminable:
+             aim = min(underminable)
+             slacks_allowed = self._get_slacks_needed(aim, len(player_reputations))
+             # Choose how to allocate allowed slacks
+        else:
+             # tit-for-tat stuff?
+             pass
+
         hunt_decisions = ['h' for x in player_reputations] # replace logic with your own
         return hunt_decisions
 
@@ -99,6 +114,18 @@ class Player:
 
         self.rounds_elapsed += 1
         pass # do nothing
+
+
+    def _get_slacks_needed(self, reputation_aim, decisions, current_reputation=self.reputation):
+        '''
+        Get number of slacks necessary to lower current reputation to reputation aim.
+        '''
+        
+        hunts = self._get_past_hunts(current_reputation, self.decisions_made)
+        for slacks in range(decisions):
+            if (hunts + (decisions - slacks + 1)) / (self.decisions_made + decisions) > reputation_aim:
+                return slacks
+        return decisions
 
 
     def _get_reputation_bounds(self, n_players, reputation=self.reputation, past=self.decisions_made):
