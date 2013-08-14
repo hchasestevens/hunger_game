@@ -68,8 +68,13 @@ class Player:
         opponents_projected = map(lambda rep: self._confidence(rep, len(player_reputations)), player_reputations)
         underminable = filter(lambda (projected,current): projected > lower_bound, opponents_projected)
         if underminable:
+            # The following are purely informational, maybe useful for debug?:
             aim = min(underminable)
             hunts_allowed = len(player_reputations) - self._get_slacks_needed(aim, len(player_reputations))
+
+            return ['s' for _ in player_reputations]
+            
+        else:
             # [(int, bool)] where int = index of player_reputations and bool = cooperated last round:
             cooperators = map(lambda ((reputation, i), prev_action): (i, prev_action >= 0),
                                       zip(sorted((rep, i) for i, rep in enumerate(player_reputations)),
@@ -77,17 +82,10 @@ class Player:
                                           )
                                       )
             cooperators.sort()
+            # [(float, bool)] where float = opponent_reputation and bool = cooperated last round:
             player_reputations = zip(player_reputations, (cooperated for i, cooperated in cooperators))
-            # TODO: take above [(float, bool)] where float = opponent_reputation and bool = cooperated last round and 
-            #  decide which of the opponents to cooperate with for the hunts we can perform (if any). If 
-            #  delta_reputation is a neccesary variable in this decision, best to make that happen in the above mapping
-            #  (talk to Chase if you're unsure what's going on it in). 
-        else:
-            # tit-for-tat stuff? - may incorporate a lot of the above, consider refactoring if so
-            pass
 
-        hunt_decisions = ['h' for x in player_reputations] # replace logic with your own
-        return hunt_decisions
+            return ['h' if previously_cooperated else 's' for _, previously_cooperated in player_reputations]
 
 
     def hunt_outcomes(self, food_earnings):
@@ -112,7 +110,6 @@ class Player:
                                                                          self.last_responses)
                                                                      )
                                                              )
-        pass # do nothing
 
 
     def round_end(self, award, m, number_hunters):
@@ -133,8 +130,6 @@ class Player:
         '''
 
         self.rounds_elapsed += 1
-
-        pass # do nothing
 
 
     def _get_slacks_needed(self, reputation_aim, decisions, current_reputation=self.reputation):
