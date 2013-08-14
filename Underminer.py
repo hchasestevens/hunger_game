@@ -30,7 +30,7 @@ class Player:
         """
         self.food = 0
         self.reputation = 0
-        self.confidence_interval = 1.0 #1.0 = 85%, 1.6 = 95%
+        self.confidence_interval = 1.0 #1.0 = 85%, 1.96 = 95%
         self.rounds_elapsed = 0
         self.player_histories = None
         self.decisions_made = 0
@@ -101,7 +101,21 @@ class Player:
         pass # do nothing
 
 
-    def _confidence(self, reputation):
+    def _get_reputation_bounds(self, n_players, reputation=self.reputation, past=self.decisions_made):
+        '''
+        Returns tuple of (upper_bound, lower_bound) possible given specified number of decisions
+        available in the current round.
+        '''
+
+        hunts = reputation * past
+        return ((hunts + n_players) / (past + n_players)), (hunts / (past + n_players))
+
+
+    def _confidence(self, reputation, n_players):
+        '''
+        Returns lower bound of a player's reputation at end-of-round with confidence_interval
+        confidence.
+        '''
         if not self.decisions_made:
             return 0
         # TODO: Third argument of following should be calculated from self.confidence_interval 
@@ -114,7 +128,11 @@ class Player:
         #  scipy.stats.stats.zprob(.95) or scipy.special.ndtr(.95) (it's unclear from 
         #  http://stackoverflow.com/questions/3496656/convert-z-score-z-value-standard-score-to-p-value-for-normal-distribution-in
         #  which of these we might want). 
-        return self._calc_confidence(reputation, self.decisions_made, self.confidence_interval)
+        prob_hunt = self._calc_confidence(reputation, self.decisions_made, self.confidence_interval)
+
+        # return how prob_hunt affects likely rep at end of this round
+        hunts = reputation * self.decisions_made
+        return (hunts + round(prob_hunt * n_players)) / (self.decisions_made + n_players)
 
 
     @staticmethod
