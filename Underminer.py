@@ -110,6 +110,10 @@ class Player:
         #  to re-write ruby's statistics2 pnormaldist func, found here as 'pnorm':
         #  http://blade.nagaokaut.ac.jp/~sinara/ruby/math/statistics2/statistics2-0.53/statistics2.rb
         #  Usage example: Statistics2.pnormaldist(1-(1-(.95))/2) == 1.96
+        #  Alternatively, try using either scipy.stats.norm.sf(.95) or 
+        #  scipy.stats.stats.zprob(.95) or scipy.special.ndtr(.95) (it's unclear from 
+        #  http://stackoverflow.com/questions/3496656/convert-z-score-z-value-standard-score-to-p-value-for-normal-distribution-in
+        #  which of these we might want). 
         return self._calc_confidence(reputation, self.decisions_made, self.confidence_interval)
 
 
