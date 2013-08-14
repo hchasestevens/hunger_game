@@ -107,7 +107,7 @@ class Player:
         available in the current round.
         '''
 
-        hunts = reputation * past
+        hunts = self._get_past_hunts(reputation, past)
         return ((hunts + n_players) / (past + n_players)), (hunts / (past + n_players))
 
 
@@ -131,7 +131,7 @@ class Player:
         prob_hunt = self._calc_confidence(reputation, self.decisions_made, self.confidence_interval)
 
         # return how prob_hunt affects likely rep at end of this round
-        hunts = reputation * self.decisions_made
+        hunts = self._get_past_hunts(reputation, self.decisions_made)
         return (hunts + round(prob_hunt * n_players)) / (self.decisions_made + n_players)
 
 
@@ -142,4 +142,8 @@ class Player:
         Taken from http://stackoverflow.com/questions/10029588/python-implementation-of-the-wilson-score-interval.
         '''
         return ((reputation + z*z/(2*n) - z * sqrt((reputation*(1-reputation)+z*z/(4*n))/n))/(1+z*z/n))
+
+    @staticmethod
+    def _get_past_hunts(reputation, past):
+        return int(ceil(reputation * past))
 
