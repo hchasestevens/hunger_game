@@ -104,13 +104,18 @@ class Player:
     def _confidence(self, reputation):
         if not self.decisions_made:
             return 0
+        # TODO: Third argument of following should be calculated from self.confidence_interval 
+        #  using p-value of normal distribution for a confidence level between 0-1 (i.e. .95
+        #  confidence interval would be 95% confidence, as expected. To do this, probably want
+        #  to re-write ruby's statistics2 pnormaldist func, found here as 'pnorm':
+        #  http://blade.nagaokaut.ac.jp/~sinara/ruby/math/statistics2/statistics2-0.53/statistics2.rb
         return self._calc_confidence(reputation, self.decisions_made, self.confidence_interval)
 
 
     @staticmethod
     def _calc_confidence(reputation, n, z):
         '''
-        Get lower bound of william score interval.
+        Get lower bound of william score interval (i.e. lower bound of "true" liklihood to hunt).
         Taken from http://stackoverflow.com/questions/10029588/python-implementation-of-the-wilson-score-interval.
         '''
         return ((reputation + z*z/(2*n) - z * sqrt((reputation*(1-reputation)+z*z/(4*n))/n))/(1+z*z/n))
