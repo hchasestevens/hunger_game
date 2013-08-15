@@ -142,7 +142,7 @@ class Player:
 
 
     def _is_distinguishable(self, n_players):
-        return (2 ** self.rounds_elapsed) >= n_players
+        return (lambda : (2 ** (self.rounds_elapsed * n_players)) >= n_players)()
 
 
     def _get_slacks_needed(self, reputation_aim, decisions, current_reputation=self.reputation):
@@ -150,6 +150,7 @@ class Player:
         Get number of slacks necessary to lower current reputation to reputation aim.
         '''
         
+        # TODO: JONAS WILL RE-WRITE THIS SO IT RUNS IN CONSTANT TIME
         hunts = self._get_past_hunts(current_reputation, self.decisions_made)
         for slacks in range(decisions):
             if (hunts + (decisions - slacks + 1)) / (self.decisions_made + decisions) > reputation_aim:
