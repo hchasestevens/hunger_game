@@ -28,7 +28,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="sample_player.py" />
-    <Compile Include="Underminer.py" />
+    <Compile Include="tit_for_tat.py" />
+    <Compile Include="underminer.py" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
 </Project>
