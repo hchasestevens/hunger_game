@@ -63,6 +63,13 @@ class Player:
         self.reputation = current_reputation
         self.player_histories.append(player_reputations)
 
+        # TODO: until _is_distinguishable, choose non-undermining strat to enact
+        #  e.g. tit-for-tat, tit-for-tat with forgiveness? Something else?
+        # The aim here would be to get in a position where many will be underminable,
+        #  so want to have high rep without
+        #   A) dying
+        #   B) overshooting majority of population 
+
         _, lower_bound = self._get_reputation_bounds(len(player_reputations))
 
         opponents_projected = map(lambda rep: self._confidence(rep, len(player_reputations)),
@@ -134,6 +141,10 @@ class Player:
         self.rounds_elapsed += 1
 
 
+    def _is_distinguishable(self, n_players):
+        return (2 ** self.rounds_elapsed) >= n_players
+
+
     def _get_slacks_needed(self, reputation_aim, decisions, current_reputation=self.reputation):
         '''
         Get number of slacks necessary to lower current reputation to reputation aim.
@@ -191,4 +202,5 @@ class Player:
     @staticmethod
     def _get_past_hunts(reputation, past):
         return int(ceil(reputation * past))
+
 
