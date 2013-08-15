@@ -28,14 +28,11 @@ class RandBot:
 def insertself(list, index):
     return list[0:index] + ['X'] + list[index:]
     
-LVL_NONE = 0
-LVL_LOW = 1
-LVL_REGULAR = 2
-LVL_DBG = 3
+class LVL():
+    NONE, LOW, REGULAR, DBG = range(4)
 
-BOT_I = 0
-FOOD_I = 1
-REP_I = 2
+class I():
+    BOT, FOOD, REP = range(3)
 
 def rungame(bots, dbg_lvl, seed=None):
     seed and random.seed(seed)
@@ -56,17 +53,17 @@ def rungame(bots, dbg_lvl, seed=None):
         
         dead_bots = 0
 
-        if dbg_lvl >= LVL_DBG:
+        if dbg_lvl >= LVL.DBG:
             print ""
             print "Round " + str(round) + ", FIGHT!"
 
         random.shuffle(entries)
-        if dbg_lvl >= LVL_DBG:
+        if dbg_lvl >= LVL.DBG:
             print "Post-shuffle entries: " + entries.__str__()
 
-        reps = map (lambda e:e[REP_I]/(tot_hunts if tot_hunts > 0 else 1.0), entries)
+        reps = map (lambda e:e[I.REP]/(tot_hunts if tot_hunts > 0 else 1.0), entries)
 
-        if dbg_lvl >= LVL_DBG:
+        if dbg_lvl >= LVL.DBG:
             print "reps: " + reps.__str__()
         
         choices = [insertself(bot.hunt_choices(round, food, rep, m, reps[0:index] + reps[index+1:]),index)
@@ -74,7 +71,7 @@ def rungame(bots, dbg_lvl, seed=None):
                    in zip (entries, range(0,p))
                    ]
         
-        if dbg_lvl >= LVL_DBG:
+        if dbg_lvl >= LVL.DBG:
             print "Choices made: ["
             for l in choices:
                 print l
@@ -84,12 +81,12 @@ def rungame(bots, dbg_lvl, seed=None):
         for i in range(0,p):
             for j in range(0,p):
                 if choices[i][j] == 'h':
-                    entries[i][REP_I] += 1
-                    entries[i][FOOD_I] -= 3
-                    entries[j][FOOD_I] += 3
+                    entries[i][I.REP] += 1
+                    entries[i][I.FOOD] -= 3
+                    entries[j][I.FOOD] += 3
                     round_hunts += 1
                 if choices[i][j] == 's':
-                    entries[i][FOOD_I] -= 2
+                    entries[i][I.FOOD] -= 2
 
         #hunt_outcomes
         for i in range(0,p):
@@ -102,40 +99,40 @@ def rungame(bots, dbg_lvl, seed=None):
                         outcomes[index] -= 1
                     if(choices[i][j]=='h'):
                         outcomes[index] += 3
-            entries[i][BOT_I].hunt_outcomes(outcomes)
+            entries[i][I.BOT].hunt_outcomes(outcomes)
 
         if round_hunts >= m:
-            if dbg_lvl >= LVL_DBG:
+            if dbg_lvl >= LVL.DBG:
                 print "Hunt goal reached in round " + str(round) + ", bonus food will be awarded"
             for e in entries:
-                e[FOOD_I] += 2*(p-1)
+                e[I.FOOD] += 2*(p-1)
         
         for e in entries:
-            if dbg_lvl >= LVL_REGULAR and e[FOOD_I] <= 0:
-                print e[BOT_I].__str__() + " failed at not starving in round " + str(round)
+            if dbg_lvl >= LVL.REGULAR and e[I.FOOD] <= 0:
+                print e[I.BOT].__str__() + " failed at not starving in round " + str(round)
                 dead_bots = 1
 
-        entries = filter (lambda e:e[FOOD_I]>0, entries)
+        entries = filter (lambda e:e[I.FOOD]>0, entries)
 
-        if dead_bots and dbg_lvl >= LVL_REGULAR:
+        if dead_bots and dbg_lvl >= LVL.REGULAR:
             print "Current state: " + entries.__str__()
 
         #round_end
         for e in entries:
-            e[BOT_I].round_end(2*(p-1) if round_hunts >= m else 0, m, round_hunts)
+            e[I.BOT].round_end(2*(p-1) if round_hunts >= m else 0, m, round_hunts)
         
         round += 1
         tot_hunts += p-1
 
         if round >= 2000 and random.random() > 0.99:
-            if dbg_lvl >= LVL_LOW:
+            if dbg_lvl >= LVL.LOW:
                 print "Game ended due to timeout"
                 break
 
 
     
-    if dbg_lvl >= LVL_LOW:
+    if dbg_lvl >= LVL.LOW:
         print "REMAINING BOTS: " + (entries.__str__() if entries else "None")
         print "=============== Game Finished ==============="
     
-rungame([RandBot(1), RandBot(0.5), RandBot(0.5), RandBot(0)], LVL_REGULAR, 1234567890)
+rungame([RandBot(1), RandBot(0.5), RandBot(0.5), RandBot(0)], LVL.REGULAR, 1234567890)
