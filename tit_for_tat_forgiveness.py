@@ -16,6 +16,10 @@ from math import sqrt
 from random import random
 
 class Player:
+    def __str__(self):
+        return "TFT_F"
+    def __repr__(self):
+        return "TFT_F"
     def __init__(self):
         """
         Optional __init__ method is run once when your Player object is created before the

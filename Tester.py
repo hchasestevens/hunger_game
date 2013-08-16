@@ -1,7 +1,7 @@
 import random
 from tit_for_tat import Player as Tft
 from tit_for_tat_forgiveness import Player as Tftf
-from underminer import Player as Underminer
+from Underminer import Player as Underminer
 
 class RandBot:
     def __str__(self):
@@ -126,7 +126,7 @@ def rungame(bots, dbg_lvl, seed=None):
         round += 1
         tot_hunts += p-1
 
-        if round >= 2000 and random.random() > 0.99:
+        if round >= 5000 and random.random() > 0.99:
             if dbg_lvl >= LVL.LOW:
                 print "Game ended due to timeout"
                 break
@@ -134,7 +134,7 @@ def rungame(bots, dbg_lvl, seed=None):
 
     
     if dbg_lvl >= LVL.LOW:
-        print "REMAINING BOTS: " + (entries.__str__() if entries else "None")
+        print "REMAINING BOTS: " + (sorted(entries,key=(lambda e:-e[I.FOOD])).__str__() if entries else "None")
         print "=============== Game Finished ==============="
     
-rungame([RandBot(1), RandBot(0.5), RandBot(0.5), RandBot(0)] + [tft()] * 3 + [tftf()] * 3 + [Underminer()], LVL.DBG, 1234567890)
+rungame([RandBot(0.5), RandBot(0.5), RandBot(0)] + [Tft()] * 3 + [Tftf()] * 3 + [Underminer()], LVL.REGULAR, 1234567890)

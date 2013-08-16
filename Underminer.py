@@ -20,7 +20,10 @@ from math import ceil
 
 class Player:
     def __str__(self):
-        return "MegaMagiTech MechaMech Mk. III"
+        return "Underminer"
+    def __repr__(self):
+        return "Underminer"
+    
     def __init__(self):
         """
         Optional __init__ method is run once when your Player object is created before the

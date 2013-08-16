@@ -13,6 +13,10 @@ General strategy:
 from math import sqrt
 
 class Player:
+    def __str__(self):
+        return "TFT"
+    def __repr__(self):
+        return "TFT"
     def __init__(self):
         """
         Optional __init__ method is run once when your Player object is created before the
