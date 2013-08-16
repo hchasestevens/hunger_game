@@ -151,18 +151,18 @@ class Player:
 
     def _get_slacks_needed(self, reputation_aim, decisions, current_reputation=None):
         '''
-        Get number of slacks necessary to lower current reputation to reputation aim.
+        Get number of slacks necessary to end the round with a reputation below the given reputation aim.
+        Note that this number is not neccesarily in [0,decisions]. If it is larger, we need to dive for more than
+        one round to reach our target. If it is negative, we will end the round below the target regardless of our
+        actions.
         '''
 
         if current_reputation==None:
             current_reputation=self.reputation
         
-        # TODO: JONAS WILL RE-WRITE THIS SO IT RUNS IN CONSTANT TIME
         hunts = self._get_past_hunts(current_reputation, self.decisions_made)
-        for slacks in range(decisions):
-            if (hunts + (decisions - slacks + 1)) / (self.decisions_made + decisions) > reputation_aim:
-                return slacks
-        return decisions
+
+        return int(ceil(hunts + decisions - (self.decisions_made + decisions)*reputation_aim))
 
 
     def _get_reputation_bounds(self, n_players, reputation=None, past=None):
@@ -215,5 +215,4 @@ class Player:
     @staticmethod
     def _get_past_hunts(reputation, past):
         return int(ceil(reputation * past))
-
 
