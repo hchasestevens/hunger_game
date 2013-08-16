@@ -157,12 +157,12 @@ class Player:
         actions.
         '''
 
-        if current_reputation==None:
-            current_reputation=self.reputation
+        if current_reputation == None:
+            current_reputation = self.reputation
         
         hunts = self._get_past_hunts(current_reputation, self.decisions_made)
 
-        return int(ceil(hunts + decisions - (self.decisions_made + decisions)*reputation_aim))
+        return int(ceil(hunts + decisions - (self.decisions_made + decisions) * reputation_aim))
 
 
     def _get_reputation_bounds(self, n_players, reputation=None, past=None):
@@ -172,9 +172,9 @@ class Player:
         '''
 
         if reputation == None:
-            reputation=self.reputation
+            reputation = self.reputation
         if past == None:
-            past=self.decisions_made
+            past = self.decisions_made
         
         hunts = self._get_past_hunts(reputation, past)
         return ((hunts + n_players) / (past + n_players)), (hunts / (past + n_players))
@@ -210,7 +210,7 @@ class Player:
         Get lower bound of william score interval (i.e. lower bound of "true" liklihood to hunt).
         Taken from http://stackoverflow.com/questions/10029588/python-implementation-of-the-wilson-score-interval.
         '''
-        return ((reputation + z*z/(2*n) - z * sqrt((reputation*(1-reputation)+z*z/(4*n))/n))/(1+z*z/n))
+        return ((reputation + z * z/(2 * n) - z * sqrt((reputation * (1 - reputation) + z * z / (4 * n)) / n)) / (1 + z * z / n))
 
     @staticmethod
     def _get_past_hunts(reputation, past):
