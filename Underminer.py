@@ -15,8 +15,12 @@ General strategy:
 '''
 
 from math import sqrt
+from math import ceil
+
 
 class Player:
+    def __str__(self):
+        return "MegaMagiTech MechaMech Mk. III"
     def __init__(self):
         """
         Optional __init__ method is run once when your Player object is created before the
@@ -75,7 +79,7 @@ class Player:
         opponents_projected = map(lambda rep: self._confidence(rep, len(player_reputations)),
                                   filter(lambda rep: rep < current_reputation, player_reputations)
                                   )
-        underminable = filter(lambda (projected,current): projected > lower_bound, opponents_projected)
+        underminable = filter(lambda projected: projected > lower_bound, opponents_projected)
         if underminable:
             # The following are purely informational, maybe useful for debug?:
             aim = min(underminable)
@@ -145,10 +149,13 @@ class Player:
         return (lambda : (2 ** (self.rounds_elapsed * n_players)) >= n_players)()
 
 
-    def _get_slacks_needed(self, reputation_aim, decisions, current_reputation=self.reputation):
+    def _get_slacks_needed(self, reputation_aim, decisions, current_reputation=None):
         '''
         Get number of slacks necessary to lower current reputation to reputation aim.
         '''
+
+        if current_reputation==None:
+            current_reputation=self.reputation
         
         # TODO: JONAS WILL RE-WRITE THIS SO IT RUNS IN CONSTANT TIME
         hunts = self._get_past_hunts(current_reputation, self.decisions_made)
@@ -158,12 +165,17 @@ class Player:
         return decisions
 
 
-    def _get_reputation_bounds(self, n_players, reputation=self.reputation, past=self.decisions_made):
+    def _get_reputation_bounds(self, n_players, reputation=None, past=None):
         '''
         Returns tuple of (upper_bound, lower_bound) possible given specified number of decisions
         available in the current round.
         '''
 
+        if reputation == None:
+            reputation=self.reputation
+        if past == None:
+            past=self.decisions_made
+        
         hunts = self._get_past_hunts(reputation, past)
         return ((hunts + n_players) / (past + n_players)), (hunts / (past + n_players))
 
