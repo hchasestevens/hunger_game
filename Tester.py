@@ -99,7 +99,7 @@ def rungame(bots, dbg_lvl, seed=None):
                     outcomes.append(-2)
                     if(choices[i][j]=='h'):
                         outcomes[index] -= 1
-                    if(choices[i][j]=='h'):
+                    if(choices[j][i]=='h'):
                         outcomes[index] += 3
             entries[i][I.BOT].hunt_outcomes(outcomes)
 
@@ -126,7 +126,7 @@ def rungame(bots, dbg_lvl, seed=None):
         round += 1
         tot_hunts += p-1
 
-        if round >= 5000 and random.random() > 0.99:
+        if round >= 50 and random.random() > 0.99:
             if dbg_lvl >= LVL.LOW:
                 print "Game ended due to timeout"
                 break
@@ -137,4 +137,4 @@ def rungame(bots, dbg_lvl, seed=None):
         print "REMAINING BOTS: " + (sorted(entries,key=(lambda e:-e[I.FOOD])).__str__() if entries else "None")
         print "=============== Game Finished ==============="
     
-rungame([RandBot(0.5), RandBot(0.5), RandBot(0)] + [Tft()] * 3 + [Tftf()] * 3 + [Underminer()], LVL.REGULAR, 1234567890)
+rungame([Tftf(), RandBot(0.5)], LVL.DBG, 1234567890)
