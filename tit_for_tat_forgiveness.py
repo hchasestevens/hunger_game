@@ -15,12 +15,17 @@ General strategy:
 from math import sqrt
 from random import random
 
-class Player:
+class Player(object):
+
     def __str__(self):
         return "TFT_F"
+
+
     def __repr__(self):
         return "TFT_F"
-    def __init__(self):
+
+
+    def __init__(self, forgiveness_rate=0.01):
         """
         Optional __init__ method is run once when your Player object is created before the
         game starts
@@ -37,7 +42,7 @@ class Player:
         self.player_histories = []
         self.last_responses = None
         self.decisions_made = 0
-        self.forgiveness_rate = 0.01
+        self.forgiveness_rate = forgiveness_rate
 
     # All the other functions are the same as with the non object oriented setting (but they
     # should be instance methods so don't forget to add 'self' as an extra first argument).

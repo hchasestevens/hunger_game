@@ -18,13 +18,17 @@ from math import sqrt
 from math import ceil
 
 
-class Player:
+class Player(object):
+
     def __str__(self):
         return "Underminer"
+
+
     def __repr__(self):
         return "Underminer"
     
-    def __init__(self):
+
+    def __init__(self, confidence_interval=1.0):
         """
         Optional __init__ method is run once when your Player object is created before the
         game starts
@@ -37,7 +41,7 @@ class Player:
         """
         self.food = 0
         self.reputation = 0
-        self.confidence_interval = 1.0 #1.0 = 85%, 1.96 = 95%
+        self.confidence_interval = confidence_interval #1.0 = 85%, 1.96 = 95%
         self.rounds_elapsed = 0
         self.player_histories = []
         self.last_responses = None
