@@ -1,5 +1,7 @@
 import random
-
+from tit_for_tat import Player as Tft
+from tit_for_tat_forgiveness import Player as Tftf
+from underminer import Player as Underminer
 
 class RandBot:
     def __str__(self):
@@ -135,4 +137,4 @@ def rungame(bots, dbg_lvl, seed=None):
         print "REMAINING BOTS: " + (entries.__str__() if entries else "None")
         print "=============== Game Finished ==============="
     
-rungame([RandBot(1), RandBot(0.5), RandBot(0.5), RandBot(0)], LVL.REGULAR, 1234567890)
+rungame([RandBot(1), RandBot(0.5), RandBot(0.5), RandBot(0)] + [tft()] * 3 + [tftf()] * 3 + [Underminer()], LVL.DBG, 1234567890)

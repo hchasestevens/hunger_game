@@ -6,8 +6,7 @@
     <ProjectGuid>1d557b1c-2862-4d86-af70-7259c60f11e7</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>
-    </StartupFile>
+    <StartupFile>tit_for_tat_forgiveness.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -30,7 +29,7 @@
     <Compile Include="sample_player.py" />
     <Compile Include="tester.py" />
     <Compile Include="tit_for_tat.py" />
-    <Compile Include="tit_for_tat_forgivenes.py" />
+    <Compile Include="tit_for_tat_forgiveness.py" />
     <Compile Include="underminer.py" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />

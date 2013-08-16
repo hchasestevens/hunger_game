@@ -1,4 +1,4 @@
-# ===Tit For Tat===
+# ===Tit For Tat with Forgiveness===
 '''
 General strategy:
 
@@ -7,6 +7,8 @@ General strategy:
 - Start first round with good-faith cooperation.
 
 - In subsequent rounds, reciprocate what was done in previous round.
+
+- Ocassionally, "forget" what happened in the previous round and cooperate regardless.
 
 '''
 
