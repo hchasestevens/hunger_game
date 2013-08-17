@@ -157,7 +157,7 @@ def rungame(bots, verbosity, seed=None):
         print "REMAINING BOTS: " + (sorted(entries,key=(lambda e:-e[Index.FOOD])).__str__() if entries else "None")
         print "=============== Game Finished ==============="
 
-    with asksaveasfile() as f:
+    with asksaveasfile(**{'defaultextension':'csv', 'initialdir' : '%HOMEPATH%\\hunger_games'}) as f:
         f.write(output)
  
         
