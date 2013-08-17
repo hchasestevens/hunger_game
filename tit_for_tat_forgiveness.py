@@ -13,7 +13,7 @@ General strategy:
 '''
 
 from math import sqrt
-from random import random
+from random import random, randint
 
 class Player(object):
 
@@ -43,6 +43,7 @@ class Player(object):
         self.last_responses = None
         self.decisions_made = 0
         self.forgiveness_rate = forgiveness_rate
+        self.id_ = randint(0, 10000)
 
     # All the other functions are the same as with the non object oriented setting (but they
     # should be instance methods so don't forget to add 'self' as an extra first argument).

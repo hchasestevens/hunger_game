@@ -13,6 +13,7 @@ class RandBot:
     
     def __init__(self, p):
         self.p = p
+        self.id_ = random.randint(0,10000)
 
     def hunt_choices(self,
                      round_number,
@@ -141,7 +142,7 @@ def rungame(bots, verbosity, seed=None):
             for entry in entries:
                 output += ','.join(
                                    map(str,[round,
-                                    id(entry[Index.BOT])
+                                    entry[Index.BOT].id_
                                     ]) + map(str,entry[:-1] + [entry[-1] / tot_hunts])
                                    ) + '\n'
 
@@ -159,11 +160,11 @@ def rungame(bots, verbosity, seed=None):
  
         
 def main():
-    rungame([Tftf(), RandBot(0.5)] + [Tft()] * 10 + [Tftf()] * 5 + [Underminer()], Verbosity.CSV, 1234567890)
+    rungame([Tftf(), RandBot(0.5)] + [Tft() for _ in range(10)] + [Tftf() for _ in range(10)] + [Underminer()], Verbosity.CSV, 1234567890)
 
            
 if __name__ == "__main__":        
     main()
-    raw_input()
+    raw_input("Enter to exit.")
 
 
