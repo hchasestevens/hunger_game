@@ -29,7 +29,7 @@ class Player(object):
         return "Underminer"
     
 
-    def __init__(self, confidence_interval=1.0):
+    def __init__(self, confidence_interval=1.0, forgiveness_rate=0.01):
         """
         Optional __init__ method is run once when your Player object is created before the
         game starts
@@ -43,6 +43,7 @@ class Player(object):
         self.food = 0
         self.reputation = 0
         self.confidence_interval = confidence_interval #1.0 = 85%, 1.96 = 95%
+        self.forgiveness_rate = forgiveness_rate
         self.rounds_elapsed = 0
         self.player_histories = []
         self.last_responses = None
@@ -84,13 +85,16 @@ class Player(object):
         opponents_projected = map(lambda rep: self._confidence(rep, len(player_reputations)),
                                   filter(lambda rep: rep < current_reputation, player_reputations)
                                   )
-        underminable = filter(lambda projected: projected > lower_bound, opponents_projected)
-        if underminable:
+        underminables = filter(lambda (_, projected): projected > lower_bound, enumerate(opponents_projected))
+        if underminables:
             # The following are purely informational, maybe useful for debug?:
+            _, underminable = zip(*underminables)
             aim = min(underminable)
             hunts_allowed = len(player_reputations) - self._get_slacks_needed(aim, len(player_reputations))
 
-            return ['s' for _ in player_reputations]
+            return ['s' if len(underminables) > 1 or underminables[0][0] == index else 'h' 
+                    for index, projected in
+                    enumerate(player_reputations)]
             
         else:
             # [(int, bool)] where int = index of player_reputations and bool = cooperated last round:
@@ -103,7 +107,9 @@ class Player(object):
             # [(float, bool)] where float = opponent_reputation and bool = cooperated last round:
             player_reputations = zip(player_reputations, (cooperated for i, cooperated in cooperators))
 
-            return ['h' if previously_cooperated else 's' for _, previously_cooperated in player_reputations]
+            return ['h' if previously_cooperated or self.forgiveness_rate > random() else 's' 
+                for _, previously_cooperated in 
+                player_reputations]
 
 
     def hunt_outcomes(self, food_earnings):

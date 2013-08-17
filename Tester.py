@@ -49,7 +49,7 @@ def rungame(bots, verbosity, seed=None):
     seed and random.seed(seed)
     
     if verbosity == Verbosity.CSV:
-        output += ','.join("round bot_id bot_type bot_details food reputation".split()) + '\n'
+        output += ','.join("seed round bot_id bot_type bot_details food reputation".split()) + '\n'
 
     #(bot, current food, amount of hunts made)
     entries = [[bot,300*(len(bots)-1),0] for bot in bots]
@@ -142,7 +142,8 @@ def rungame(bots, verbosity, seed=None):
         if verbosity == Verbosity.CSV:
             for entry in entries:
                 output += ','.join(
-                                   map(str,[round,
+                                   map(str,[seed,
+                                    round,
                                     entry[Index.BOT].id_,
                                     str(entry[Index.BOT]).split()[0]
                                     ]) + map(str,entry[:-1] + [entry[-1] / tot_hunts])
@@ -162,13 +163,19 @@ def rungame(bots, verbosity, seed=None):
  
         
 def main():
+    config = {
+              'underminers': 1, # +1 (1.96 preset)
+              'randbots': 2,
+              'tftfs': 1,
+              'tfts': 1,
+              }
     rungame(
-            [RandBot(random.random()) for _ in xrange(2)] + 
-            [Tft() for _ in xrange(1)] + 
-            [Tftf(random.random()) for _ in xrange(1)] + 
-            [Underminer(random.random() * 2) for _ in xrange(1)] + 
+            [RandBot(random.random()) for _ in xrange(config['randbots'])] + 
+            [Tft() for _ in xrange(config['tfts'])] + 
+            [Tftf(random.random()) for _ in xrange(config['tftfs'])] + 
+            [Underminer(random.random() * 2) for _ in xrange(config['underminers'])] + 
             [Underminer(1.96)]
-            , Verbosity.CSV, 1234567890)
+            , Verbosity.CSV, random.randint(0,1000000))
 
            
 if __name__ == "__main__":        
