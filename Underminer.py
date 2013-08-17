@@ -74,12 +74,8 @@ class Player(object):
         self.reputation = current_reputation
         self.player_histories.append(player_reputations)
 
-        # TODO: until _is_distinguishable, choose non-undermining strat to enact
-        #  e.g. tit-for-tat, tit-for-tat with forgiveness? Something else?
-        # The aim here would be to get in a position where many will be underminable,
-        #  so want to have high rep without
-        #   A) dying
-        #   B) overshooting majority of population 
+        if round_number <= 3:
+            return ['h' for _ in player_reputations]
 
         _, lower_bound = self._get_reputation_bounds(len(player_reputations))
 
