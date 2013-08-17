@@ -3,7 +3,7 @@ from tit_for_tat import Player as Tft
 from tit_for_tat_forgiveness import Player as Tftf
 from underminer import Player as Underminer
 from tkFileDialog import asksaveasfile
-
+from better_backstabber import Player as BetterBackstabber
 
 class RandBot:
     def __str__(self):
@@ -166,18 +166,20 @@ def rungame(bots, verbosity, seed=None):
 def main():
     config = {
               'underminers': 1, # +1 (1.96 preset)
-              'randbots': 1,
+              'randbots': 2,
               'tftfs': 2,
               'tfts': 3,
+              'backstabber': 2
               }
-    scale = 20
+    scale = 15
     config = {key: value * scale for key, value in config.iteritems()}
     rungame(
             [RandBot(random.random()) for _ in xrange(config['randbots'])] + 
             [Tft() for _ in xrange(config['tfts'])] + 
             [Tftf(random.random()) for _ in xrange(config['tftfs'])] + 
             [Underminer(random.random() * 2) for _ in xrange(config['underminers'])] + 
-            [Underminer(1.96)]
+            [Underminer(1.96)] + 
+            [BetterBackstabber() for _ in xrange(config['backstabber'])]
             , Verbosity.CSV, random.randint(0,1000000))
 
            
