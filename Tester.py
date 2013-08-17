@@ -4,6 +4,7 @@ from tit_for_tat_forgiveness import Player as Tftf
 from underminer import Player as Underminer
 from tkFileDialog import asksaveasfile
 
+
 class RandBot:
     def __str__(self):
         return "RandBot (" + str(self.p) + ")"
@@ -149,7 +150,7 @@ def rungame(bots, verbosity, seed=None):
                                     ]) + map(str,entry[:-1] + [entry[-1] / tot_hunts])
                                    ) + '\n'
 
-        if round >= 50 and random.random() > 0.99:
+        if round >= 1000 and random.random() > 0.99:
             if Verbosity.CSV > verbosity >= Verbosity.LOW:
                 print "Game ended due to timeout"
             break
@@ -165,10 +166,12 @@ def rungame(bots, verbosity, seed=None):
 def main():
     config = {
               'underminers': 1, # +1 (1.96 preset)
-              'randbots': 2,
-              'tftfs': 1,
-              'tfts': 1,
+              'randbots': 1,
+              'tftfs': 2,
+              'tfts': 3,
               }
+    scale = 20
+    config = {key: value * scale for key, value in config.iteritems()}
     rungame(
             [RandBot(random.random()) for _ in xrange(config['randbots'])] + 
             [Tft() for _ in xrange(config['tfts'])] + 

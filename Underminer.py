@@ -77,7 +77,7 @@ class Player(object):
         self.reputation = current_reputation
         self.player_histories.append(player_reputations)
 
-        if round_number <= 3:
+        if round_number <= 5:
             return ['h' for _ in player_reputations]
 
         _, lower_bound = self._get_reputation_bounds(len(player_reputations))
