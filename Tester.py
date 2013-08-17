@@ -67,7 +67,7 @@ def rungame(bots, verbosity, seed=None):
         
         dead_bots = 0
 
-        if verbosity == Verbosity.DBG:
+        if verbosity >= Verbosity.DBG:
             print ""
             print "Round " + str(round) + ", FIGHT!"
 
@@ -163,10 +163,11 @@ def rungame(bots, verbosity, seed=None):
         
 def main():
     rungame(
-            [RandBot(random.random()) for _ in xrange(25)] + 
-            [Tft() for _ in xrange(50)] + 
-            [Tftf(random.random()) for _ in xrange(50)] + 
-            [Underminer(random.random() * 2) for _ in xrange(10)]
+            [RandBot(random.random()) for _ in xrange(2)] + 
+            [Tft() for _ in xrange(1)] + 
+            [Tftf(random.random()) for _ in xrange(1)] + 
+            [Underminer(random.random() * 2) for _ in xrange(1)] + 
+            [Underminer(1.96)]
             , Verbosity.CSV, 1234567890)
 
            
