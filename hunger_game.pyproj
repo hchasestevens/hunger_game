@@ -6,7 +6,7 @@
     <ProjectGuid>1d557b1c-2862-4d86-af70-7259c60f11e7</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>tit_for_tat_forgiveness.py</StartupFile>
+    <StartupFile>tester.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
