@@ -18,7 +18,7 @@ from random import random, randint
 class Player(object):
 
     def __str__(self):
-        return "TFT_F"
+        return "TFT_F (" + str(self.forgiveness_rate) + ")"
 
 
     def __repr__(self):

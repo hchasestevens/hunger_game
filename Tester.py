@@ -6,7 +6,7 @@ from tkFileDialog import asksaveasfile
 
 class RandBot:
     def __str__(self):
-        return "RandBot Mk. IV (" + str(self.p) + ")"
+        return "RandBot (" + str(self.p) + ")"
     def __repr__(self):
         return self.__str__()
 
@@ -49,7 +49,7 @@ def rungame(bots, verbosity, seed=None):
     seed and random.seed(seed)
     
     if verbosity == Verbosity.CSV:
-        output += ','.join("round bot_id bot_type food reputation".split()) + '\n'
+        output += ','.join("round bot_id bot_type bot_details food reputation".split()) + '\n'
 
     #(bot, current food, amount of hunts made)
     entries = [[bot,300*(len(bots)-1),0] for bot in bots]
@@ -138,11 +138,13 @@ def rungame(bots, verbosity, seed=None):
         round += 1
         tot_hunts += p-1
 
+        # CSV output
         if verbosity == Verbosity.CSV:
             for entry in entries:
                 output += ','.join(
                                    map(str,[round,
-                                    entry[Index.BOT].id_
+                                    entry[Index.BOT].id_,
+                                    str(entry[Index.BOT]).split()[0]
                                     ]) + map(str,entry[:-1] + [entry[-1] / tot_hunts])
                                    ) + '\n'
 
@@ -160,7 +162,12 @@ def rungame(bots, verbosity, seed=None):
  
         
 def main():
-    rungame([Tftf(), RandBot(0.5)] + [Tft() for _ in range(10)] + [Tftf() for _ in range(10)] + [Underminer()], Verbosity.CSV, 1234567890)
+    rungame(
+            [RandBot(random.random()) for _ in xrange(25)] + 
+            [Tft() for _ in xrange(50)] + 
+            [Tftf(random.random()) for _ in xrange(50)] + 
+            [Underminer(random.random() * 2) for _ in xrange(10)]
+            , Verbosity.CSV, 1234567890)
 
            
 if __name__ == "__main__":        

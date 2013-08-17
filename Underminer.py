@@ -22,7 +22,7 @@ from random import randint
 class Player(object):
 
     def __str__(self):
-        return "Underminer"
+        return "Underminer (%s)" %(str(self.confidence_interval))
 
 
     def __repr__(self):
