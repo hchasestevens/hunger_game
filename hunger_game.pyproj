@@ -26,6 +26,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="better_backstabber.py" />
     <Compile Include="sample_player.py" />
     <Compile Include="tester.py" />
     <Compile Include="tit_for_tat.py" />

@@ -12,42 +12,42 @@ General strategy:
  thereby assuming their identity (and making gains) while simultaneously
  offloading some repercussions.
 
+- Otherwise, act as a (forgiving) tit-for-tat bot.
+
 '''
 
 from math import sqrt
 from math import ceil
 from random import randint
-
+from random import random
 
 class Player(object):
 
     def __str__(self):
-        return "Underminer (%s)" %(str(self.confidence_interval))
+        return "Underminer (conf: %s | forg: %s | lim: %s)" %(str(self.confidence_interval), str(self.forgiveness_rate), str(self.cooperation_limit))
 
 
     def __repr__(self):
         return "Underminer"
     
 
-    def __init__(self, confidence_interval=1.0, forgiveness_rate=0.01):
+    def __init__(self, confidence_interval=1.96, forgiveness_rate=0.01, cooperation_limit=5):
         """
         Optional __init__ method is run once when your Player object is created before the
         game starts
-
-        You can add other internal (instance) variables here at your discretion.
-
-        You don't need to define food or reputation as instance variables, since the host
-        will never use them. The host will keep track of your food and reputation for you
-        as well, and return it through hunt_choices.
         """
+
         self.food = 0
         self.reputation = 0
         self.confidence_interval = confidence_interval #1.0 = 85%, 1.96 = 95%
         self.forgiveness_rate = forgiveness_rate
+        self.cooperation_limit = cooperation_limit
         self.rounds_elapsed = 0
         self.player_histories = []
         self.last_responses = None
         self.decisions_made = 0
+
+        # For debugging:
         self.id_ = randint(0, 10000)
 
     # All the other functions are the same as with the non object oriented setting (but they
@@ -56,15 +56,6 @@ class Player(object):
     def hunt_choices(self, round_number, current_food, current_reputation, m,
             player_reputations):
         ''' 
-        The main routine that plays each individual round.
-
-        You must create an array of variables 'hunt_decisions' and assign an 'h' for hunt or
-        an 's' for slack (i.e., not hunt) to each member of the array; the order of the hunt
-        decisions in hunt_decisions should correspond to the order of opponents'
-        reputations in player_reputations.
-
-        Blank variables or errors will be assigned 's'.
-
         The variables passed in to hunt_choices for your use are:
             round_number: integer, the number round you are in.
             current_food: integer, the amount of food you have.
@@ -77,7 +68,7 @@ class Player(object):
         self.reputation = current_reputation
         self.player_histories.append(player_reputations)
 
-        if round_number <= 5:
+        if round_number <= self.cooperation_limit: # Chosen empirically
             return ['h' for _ in player_reputations]
 
         _, lower_bound = self._get_reputation_bounds(len(player_reputations))
@@ -92,11 +83,14 @@ class Player(object):
             aim = min(underminable)
             hunts_allowed = len(player_reputations) - self._get_slacks_needed(aim, len(player_reputations))
 
+            # Hunting with the players we undermine overall confers an advantage, if players = 1
             return ['s' if len(underminables) > 1 or underminables[0][0] == index else 'h' 
                     for index, projected in
                     enumerate(player_reputations)]
             
         else:
+            # Forgiving tit-for-tat, based off reasonable assumption that player reputation rankings are
+            #  mostly static after a few rounds.
             # [(int, bool)] where int = index of player_reputations and bool = cooperated last round:
             cooperators = map(lambda ((reputation, i), prev_action): (i, prev_action >= 0),
                                       zip(sorted((rep, i) for i, rep in enumerate(player_reputations)),
@@ -114,10 +108,6 @@ class Player(object):
 
     def hunt_outcomes(self, food_earnings):
         '''
-        hunt_outcomes is called after all hunts for the round are complete.
-
-        Add any code you wish to modify your variables based on the outcome of the last round.
-
         The variable passed in to hunt_outcomes for your use is:
             food_earnings: list of integers, the amount of food earned from the last round's hunts.
                            The entries can be negative as it is possible to lose food from a hunt.
@@ -138,14 +128,6 @@ class Player(object):
 
     def round_end(self, award, m, number_hunters):
         '''
-        round_end is called after all hunts for the round are complete.
-
-        award - the total amount of food you received due to cooperation in the round.
-        can be zero if the threshold m was not reached.
-
-        add any code you wish to modify your variables based on the cooperation that occurred in
-        the last round.
-
         the variables passed in to round_end for your use are:
             award: integer, total food bonus (can be zero) you received due to players cooperating
                    during the last round. the amount of food you have for the next round will be
@@ -207,7 +189,7 @@ class Player(object):
         #  Alternatively, try using either scipy.stats.norm.sf(.95) or 
         #  scipy.stats.stats.zprob(.95) or scipy.special.ndtr(.95) (it's unclear from 
         #  http://stackoverflow.com/questions/3496656/convert-z-score-z-value-standard-score-to-p-value-for-normal-distribution-in
-        #  which of these we might want). 
+        #  which of these we might want). If this remains unimplemented, 1.96 -> 95% and 1.0 -> 85%.
         prob_hunt = self._calc_confidence(reputation, self.decisions_made, self.confidence_interval)
 
         # return how prob_hunt affects likely rep at end of this round

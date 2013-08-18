@@ -43,14 +43,14 @@ class Index():
     BOT, FOOD, REP = range(3)
 
 
-def rungame(bots, verbosity, seed=None):
+def rungame(bots, verbosity, game, seed=None):
 
     output = ""
 
     seed and random.seed(seed)
     
     if verbosity == Verbosity.CSV:
-        output += ','.join("seed round bot_id bot_type bot_details food reputation".split()) + '\n'
+        output += ','.join("game seed round bot_id bot_type bot_details food reputation".split()) + '\n'
 
     #(bot, current food, amount of hunts made)
     entries = [[bot,300*(len(bots)-1),0] for bot in bots]
@@ -70,7 +70,7 @@ def rungame(bots, verbosity, seed=None):
 
         if verbosity >= Verbosity.DBG:
             print ""
-            print "Round " + str(round) + ", FIGHT!"
+            print "Round " + str(round) + ", FIGHT!",
 
         random.shuffle(entries)
         if verbosity == Verbosity.DBG:
@@ -143,14 +143,15 @@ def rungame(bots, verbosity, seed=None):
         if verbosity == Verbosity.CSV:
             for entry in entries:
                 output += ','.join(
-                                   map(str,[seed,
+                                   map(str,[game,
+                                    seed,
                                     round,
                                     entry[Index.BOT].id_,
                                     str(entry[Index.BOT]).split()[0]
                                     ]) + map(str,entry[:-1] + [entry[-1] / tot_hunts])
                                    ) + '\n'
 
-        if round >= 1000 and random.random() > 0.99:
+        if round >= 2000 and (True or random.random() > 0.99):
             if Verbosity.CSV > verbosity >= Verbosity.LOW:
                 print "Game ended due to timeout"
             break
@@ -159,32 +160,36 @@ def rungame(bots, verbosity, seed=None):
         print "REMAINING BOTS: " + (sorted(entries,key=(lambda e:-e[Index.FOOD])).__str__() if entries else "None")
         print "=============== Game Finished ==============="
 
-    with asksaveasfile(**{'defaultextension':'csv', 'initialdir' : '%HOMEPATH%\\hunger_games'}) as f:
+    with open('%HOMEPATH%\\hunger_games\\testing\\%s.csv' %(game), 'w') as f:
         f.write(output)
+#    with asksaveasfile(**{'defaultextension':'csv', 'initialdir' : '%HOMEPATH%\\hunger_games'}) as f:
+#        f.write(output)
  
         
-def main():
+def main(games):
     config = {
               'underminers': 1, # +1 (1.96 preset)
-              'randbots': 2,
-              'tftfs': 2,
-              'tfts': 3,
-              'backstabber': 2
+              'randbots': 4,
+              'tftfs': 4,
+              'tfts': 6,
+              'backstabber': 4
               }
-    scale = 15
+    scale = 14
     config = {key: value * scale for key, value in config.iteritems()}
-    rungame(
-            [RandBot(random.random()) for _ in xrange(config['randbots'])] + 
-            [Tft() for _ in xrange(config['tfts'])] + 
-            [Tftf(random.random()) for _ in xrange(config['tftfs'])] + 
-            [Underminer(random.random() * 2) for _ in xrange(config['underminers'])] + 
-            [Underminer(1.96)] + 
-            [BetterBackstabber() for _ in xrange(config['backstabber'])]
-            , Verbosity.CSV, random.randint(0,1000000))
+    for x in range(games):
+        print "=== GAME %s ===" %(x)
+        rungame(
+                [RandBot(_ * (float(1) / config['randbots'])) for _ in xrange(config['randbots'])] + 
+                [Tft() for _ in xrange(config['tfts'])] + 
+                [Tftf(_ * (float(1) / config['tftfs'])) for _ in xrange(config['tftfs'])] + 
+                #[Underminer(random.random() * 2, random.random() / 100, random.randint(0,10)) for _ in xrange(config['underminers'])] + 
+                [Underminer(random.random() * 2, random.random() / 100, random.randint(0,10))] + 
+                [BetterBackstabber() for _ in xrange(config['backstabber'])]
+                , Verbosity.CSV, game=x, seed=1234567890)
 
            
 if __name__ == "__main__":        
-    main()
+    main(20)
     raw_input("Enter to exit.")
 
 
