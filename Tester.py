@@ -151,7 +151,7 @@ def rungame(bots, verbosity, game, seed=None):
                                     ]) + map(str,entry[:-1] + [entry[-1] / tot_hunts])
                                    ) + '\n'
 
-        if round >= 2000 and (True or random.random() > 0.99):
+        if round >= 200 and (True or random.random() > 0.99):
             if Verbosity.CSV > verbosity >= Verbosity.LOW:
                 print "Game ended due to timeout"
             break
@@ -189,7 +189,7 @@ def main(games):
 
            
 if __name__ == "__main__":        
-    main(50)
+    main(1)
     raw_input("Enter to exit.")
 
 

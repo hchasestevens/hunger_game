@@ -2,7 +2,8 @@
 '''
 General strategy:
 
-- Assume other players are inferring identity via reputation.
+- Assume other players are inferring identity via reputation as described
+ below.
 
 - Assume (at least some of) these other players are employing tit-for-tat.
 
@@ -12,7 +13,9 @@ General strategy:
  thereby assuming their identity (and making gains) while simultaneously
  offloading some repercussions.
 
-- Otherwise, act as a (forgiving) tit-for-tat bot.
+- Otherwise, act as a (forgiving) tit-for-tat bot. To link players between
+ rounds, assume that ordering of player reputations is largely preserved
+ between rounds.
 
 '''
 
@@ -39,19 +42,19 @@ class Player(object):
 
         self.food = 0
         self.reputation = 0
-        self.confidence_interval = confidence_interval #1.0 = 85%, 1.96 = 95%
-        self.forgiveness_rate = forgiveness_rate
-        self.cooperation_limit = cooperation_limit
         self.rounds_elapsed = 0
         self.player_histories = []
         self.last_responses = None
         self.decisions_made = 0
 
+        # Chosen via empirical testing:
+        self.confidence_interval = 1.318668962 #1.0 = 85%, 1.96 = 95%
+        self.forgiveness_rate = 0.009708212
+        self.cooperation_limit = 2
+
         # For debugging:
         self.id_ = randint(0, 10000)
 
-    # All the other functions are the same as with the non object oriented setting (but they
-    # should be instance methods so don't forget to add 'self' as an extra first argument).
 
     def hunt_choices(self, round_number, current_food, current_reputation, m,
             player_reputations):
@@ -68,7 +71,7 @@ class Player(object):
         self.reputation = current_reputation
         self.player_histories.append(player_reputations)
 
-        if round_number <= self.cooperation_limit: # Chosen empirically
+        if round_number <= self.cooperation_limit:
             return ['h' for _ in player_reputations]
 
         _, lower_bound = self._get_reputation_bounds(len(player_reputations))
@@ -78,19 +81,15 @@ class Player(object):
                                   )
         underminables = filter(lambda (_, projected): projected > lower_bound, enumerate(opponents_projected))
         if underminables:
-            # The following are purely informational, maybe useful for debug?:
-            _, underminable = zip(*underminables)
-            aim = min(underminable)
-            hunts_allowed = len(player_reputations) - self._get_slacks_needed(aim, len(player_reputations))
-
-            # Hunting with the players we undermine overall confers an advantage, if players = 1
+            # Hunting with the players we undermine overall confers an advantage, if players == 1
             return ['s' if len(underminables) > 1 or underminables[0][0] == index else 'h' 
                     for index, projected in
                     enumerate(player_reputations)]
             
         else:
             # Forgiving tit-for-tat, based off reasonable assumption that player reputation rankings are
-            #  mostly static after a few rounds.
+            #  mostly static after a few rounds (see above).
+
             # [(int, bool)] where int = index of player_reputations and bool = cooperated last round:
             cooperators = map(lambda ((reputation, i), prev_action): (i, prev_action >= 0),
                                       zip(sorted((rep, i) for i, rep in enumerate(player_reputations)),
@@ -98,6 +97,7 @@ class Player(object):
                                           )
                                       )
             cooperators.sort()
+
             # [(float, bool)] where float = opponent_reputation and bool = cooperated last round:
             player_reputations = zip(player_reputations, (cooperated for i, cooperated in cooperators))
 
@@ -119,7 +119,7 @@ class Player(object):
         self.decisions_made += len(food_earnings)
         self.last_responses = food_earnings
 
-        # match results with reputations, order accordingly:
+        # Match results with reputations, order accordingly:
         self.player_histories[-1], self.last_responses = zip(*sorted(zip(self.player_histories[-1],
                                                                          self.last_responses)
                                                                      )
@@ -136,26 +136,6 @@ class Player(object):
         '''
 
         self.rounds_elapsed += 1
-
-
-    def _is_distinguishable(self, n_players):
-        return (lambda : (2 ** (self.rounds_elapsed * n_players)) >= n_players)()
-
-
-    def _get_slacks_needed(self, reputation_aim, decisions, current_reputation=None):
-        '''
-        Get number of slacks necessary to end the round with a reputation below the given reputation aim.
-        Note that this number is not neccesarily in [0,decisions]. If it is larger, we need to dive for more than
-        one round to reach our target. If it is negative, we will end the round below the target regardless of our
-        actions.
-        '''
-
-        if current_reputation == None:
-            current_reputation = self.reputation
-        
-        hunts = self._get_past_hunts(current_reputation, self.decisions_made)
-
-        return int(ceil(hunts + decisions - (self.decisions_made + decisions) * reputation_aim))
 
 
     def _get_reputation_bounds(self, n_players, reputation=None, past=None):
@@ -180,19 +160,9 @@ class Player(object):
         '''
         if not self.decisions_made:
             return 0
-        # TODO: Third argument of following should be calculated from self.confidence_interval 
-        #  using p-value of normal distribution for a confidence level between 0-1 (i.e. .95
-        #  confidence interval would be 95% confidence, as expected. To do this, probably want
-        #  to re-write ruby's statistics2 pnormaldist func, found here as 'pnorm':
-        #  http://blade.nagaokaut.ac.jp/~sinara/ruby/math/statistics2/statistics2-0.53/statistics2.rb
-        #  Usage example: Statistics2.pnormaldist(1-(1-(.95))/2) == 1.96
-        #  Alternatively, try using either scipy.stats.norm.sf(.95) or 
-        #  scipy.stats.stats.zprob(.95) or scipy.special.ndtr(.95) (it's unclear from 
-        #  http://stackoverflow.com/questions/3496656/convert-z-score-z-value-standard-score-to-p-value-for-normal-distribution-in
-        #  which of these we might want). If this remains unimplemented, 1.96 -> 95% and 1.0 -> 85%.
         prob_hunt = self._calc_confidence(reputation, self.decisions_made, self.confidence_interval)
 
-        # return how prob_hunt affects likely rep at end of this round
+        # Return how prob_hunt affects likely rep at end of this round
         hunts = self._get_past_hunts(reputation, self.decisions_made)
         return (hunts + round(prob_hunt * n_players)) / (self.decisions_made + n_players)
 
@@ -204,6 +174,7 @@ class Player(object):
         Taken from http://stackoverflow.com/questions/10029588/python-implementation-of-the-wilson-score-interval.
         '''
         return ((reputation + z * z/(2 * n) - z * sqrt((reputation * (1 - reputation) + z * z / (4 * n)) / n)) / (1 + z * z / n))
+
 
     @staticmethod
     def _get_past_hunts(reputation, past):
