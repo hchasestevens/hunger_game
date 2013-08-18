@@ -160,7 +160,7 @@ def rungame(bots, verbosity, game, seed=None):
         print "REMAINING BOTS: " + (sorted(entries,key=(lambda e:-e[Index.FOOD])).__str__() if entries else "None")
         print "=============== Game Finished ==============="
 
-    with open('%HOMEPATH%\\hunger_games\\testing\\%s.csv' %(game), 'w') as f:
+    with open(u'I:/Users/Chase Stevens/Documents/hunger_games/testing/' + str(game) + '.csv', 'w') as f:
         f.write(output)
 #    with asksaveasfile(**{'defaultextension':'csv', 'initialdir' : '%HOMEPATH%\\hunger_games'}) as f:
 #        f.write(output)
@@ -189,7 +189,7 @@ def main(games):
 
            
 if __name__ == "__main__":        
-    main(20)
+    main(50)
     raw_input("Enter to exit.")
 
 
